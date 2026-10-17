@@ -90,3 +90,27 @@ int main() {
         std::string marca = MARCAS[rand() % MARCAS.size()];
         std::string color = COLORES[rand() % COLORES.size()];
         std::string hora = obtenerHoraActual();
+       // Informacion enviada por el socket: MATRICULA|MARCA|COLOR|HORA
+        std::string trama = placa + "|" + marca + "|" + color + "|" + hora;
+
+        std::cout << ">>> Placa: " << placa << " | " << marca << " (" << color << ") | Hora: " << hora;
+        std::cout << (esReintentoSalida ? " [PLACA REPETIDA -> SALIDA]\n" : " [NUEVA PLACA -> INGRESO]\n");
+
+        send(sock, trama.c_str(), (int)trama.length(), 0);
+
+        memset(buffer, 0, BUFFER_SIZE);
+        int readBytes = recv(sock, buffer, BUFFER_SIZE - 1, 0);
+        if (readBytes > 0) {
+            buffer[readBytes] = '\0';
+            std::cout << "    <<< [RESPUESTA DEL SERVIDOR]: " << buffer << "\n";
+        }
+
+        // Intervalo aleatorio entre 2 y 5 segundos para generar una matricula
+        int segundosEspera = 2 + (rand() % 4); // Genera 2, 3, 4 o 5
+        Sleep(segundosEspera * 1000);
+    }
+
+    closesocket(sock);
+    WSACleanup();
+    return 0;
+}
