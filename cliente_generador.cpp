@@ -71,3 +71,22 @@ int main() {
     }
 
     std::cout << "[EXITO] Conectado. Transmitiendo vehiculos cada 2 a 5 segundos...\n\n";
+
+    while (true) {
+        std::string placa;
+        bool esReintentoSalida = false;
+
+        // Condicional de 40% de probabilidad de repetir una placa existente para forzar SALIDA
+        if (!poolPlacasEstacionadas.empty() && (rand() % 100 < 40)) {
+            int idx = rand() % poolPlacasEstacionadas.size();
+            placa = poolPlacasEstacionadas[idx];
+            poolPlacasEstacionadas.erase(poolPlacasEstacionadas.begin() + idx);
+            esReintentoSalida = true;
+        } else {
+            placa = generarMatriculaAleatoria();
+            poolPlacasEstacionadas.push_back(placa);
+        }
+
+        std::string marca = MARCAS[rand() % MARCAS.size()];
+        std::string color = COLORES[rand() % COLORES.size()];
+        std::string hora = obtenerHoraActual();
