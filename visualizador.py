@@ -57,3 +57,17 @@ def crear_interfaz(self):
 
         grid_frame = tk.Frame(left_panel, bg="#0f172a")
         grid_frame.pack(fill="both", expand=True)
+       for i in range(self.TOTAL_CELDAS):
+            row, col = i // 5, i % 5
+            card = tk.Frame(grid_frame, bg="#1e293b", relief="groove", bd=2, padx=5, pady=5)
+            card.grid(row=row, column=col, padx=4, pady=4, sticky="nsew")
+            grid_frame.grid_columnconfigure(col, weight=1)
+            grid_frame.grid_rowconfigure(row, weight=1)
+
+            tk.Label(card, text=f"C-{i+1}", font=("Consolas", 9, "bold"), fg="#94a3b8", bg="#1e293b").pack(anchor="w")
+            lbl_placa = tk.Label(card, text="LIBRE", font=("Consolas", 11, "bold"), fg="#64748b", bg="#1e293b")
+            lbl_placa.pack(pady=4)
+            lbl_hora = tk.Label(card, text="--:--:--", font=("Segoe UI", 8), fg="#64748b", bg="#1e293b")
+            lbl_hora.pack(anchor="e")
+
+            self.celdas_widgets[i] = {"frame": card, "placa": lbl_placa, "hora": lbl_hora}
