@@ -71,3 +71,12 @@ def crear_interfaz(self):
             lbl_hora.pack(anchor="e")
 
             self.celdas_widgets[i] = {"frame": card, "placa": lbl_placa, "hora": lbl_hora}
+
+        # Panel de Eventos (Historial)
+        right_panel = tk.LabelFrame(main_box, text=" Registro de Eventos ", font=("Segoe UI", 11, "bold"), 
+                                    fg="#a855f7", bg="#0f172a", width=340, padx=10, pady=10)
+        right_panel.pack(side="right", fill="both", padx=(10, 0))
+
+        self.log_list = tk.Listbox(right_panel, bg="#020617", fg="#e2e8f0", font=("Consolas", 9), width=38)
+        self.log_list.pack(fill="both", expand=True)
+cc
