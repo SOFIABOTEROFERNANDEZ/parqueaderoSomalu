@@ -79,4 +79,27 @@ def crear_interfaz(self):
 
         self.log_list = tk.Listbox(right_panel, bg="#020617", fg="#e2e8f0", font=("Consolas", 9), width=38)
         self.log_list.pack(fill="both", expand=True)
-cc
+
+  def verificar_eventos_dll(self):
+        if dll.HayNuevoEvento():
+            tipo = ctypes.c_int()
+            placa = ctypes.create_string_buffer(16)
+            marca = ctypes.create_string_buffer(32)
+            color = ctypes.create_string_buffer(32)
+            celda = ctypes.create_string_buffer(16)
+            hora = ctypes.create_string_buffer(16)
+            mensaje = ctypes.create_string_buffer(128)
+
+            if dll.ObtenerSiguienteEvento(ctypes.byref(tipo), placa, marca, color, celda, hora, mensaje):
+                s_placa = placa.value.decode("utf-8")
+                s_celda = celda.value.decode("utf-8")
+                s_hora = hora.value.decode("utf-8")
+                idx = int(s_celda.replace("C-", "")) - 1 if "C-" in s_celda else -1
+
+                if tipo.value == 1: # INGRESO
+                    self.log_list.insert(0, f"[{s_hora}] INGRESO: {s_placa} en {s_celda}")
+                    if 0 <= idx < self.TOTAL_CELDAS:
+                        self.celdas_widgets[idx]["frame"].configure(bg="#064e3b")
+                        self.celdas_widgets[idx]["placa"].configure(text=s_placa, fg="#34d399", bg="#064e3b")
+                        self.celdas_widgets[idx]["hora"].configure(text=s_hora, fg="#a7f3d0", bg="#064e3b")
+
