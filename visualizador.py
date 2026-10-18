@@ -103,3 +103,19 @@ def crear_interfaz(self):
                         self.celdas_widgets[idx]["placa"].configure(text=s_placa, fg="#34d399", bg="#064e3b")
                         self.celdas_widgets[idx]["hora"].configure(text=s_hora, fg="#a7f3d0", bg="#064e3b")
 
+                elif tipo.value == 2: # LIBERACION (Placa repetida)
+                    self.log_list.insert(0, f"[{s_hora}] LIBERADA: {s_placa} salio de {s_celda}")
+                    if 0 <= idx < self.TOTAL_CELDAS:
+                        self.celdas_widgets[idx]["frame"].configure(bg="#1e293b")
+                        self.celdas_widgets[idx]["placa"].configure(text="LIBRE", fg="#64748b", bg="#1e293b")
+                        self.celdas_widgets[idx]["hora"].configure(text="--:--:--", fg="#64748b", bg="#1e293b")
+
+        self.after(100, self.verificar_eventos_dll)
+
+    def al_cerrar(self):
+        dll.DetenerModuloParqueadero()
+        self.destroy()
+
+if __name__ == "__main__":
+    app = ParqueaderoVisualizer()
+    app.mainloop()
