@@ -26,3 +26,19 @@ if defined COMPILER goto HACER_COMPILACION
 
 if exist "C:\msys64\mingw64\bin\g++.exe" set "COMPILER=C:\msys64\mingw64\bin\g++.exe"
 if defined COMPILER goto HACER_COMPILACION
+
+:: 3. Si no se encontro ningun g++ instalado
+echo [ALERTA] No se encontro el compilador g++ en tu equipo.
+echo.
+echo Para solucionarlo en 1 minuto de forma rapida y segura:
+echo   1. Descarga el compilador portable:
+echo      https://github.com/skeeto/w64devkit/releases (w64devkit.zip)
+echo   2. Descomprime la carpeta en C:\MinGW
+echo      (debe quedar el archivo C:\MinGW\bin\g++.exe)
+echo   3. Vuelve a ejecutar este build.bat.
+echo.
+echo NOTA: Tambien puedes compilar usando Python ejecutando:
+echo       python compilar.py
+echo.
+pause
+exit /b 1
