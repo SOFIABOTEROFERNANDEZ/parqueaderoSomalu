@@ -1,0 +1,30 @@
+# ========================================================
+# 1. EXCLUSIONES GENERALES DE BINARIOS Y GENERADOS
+# ========================================================
+# Archivos compilados y objetos
+*.exe
+*.dll
+*.o
+*.obj
+*.so
+*.dylib
+
+# Python (bytecode y entornos)
+__pycache__/
+*.pyc
+*.pyo
+.env/
+venv/
+env/
+
+# Temporales de editores y sistemas operativos
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# ========================================================
+# 2. EXCEPCIONES: BINARIOS QUE SÍ SE DEBEN SUBIR
+# ========================================================
+!cliente_generador.exe
+!parqueadero_bridge.dll
