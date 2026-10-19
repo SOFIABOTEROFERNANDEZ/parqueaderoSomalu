@@ -53,3 +53,26 @@ if errorlevel 1 goto ERROR_DLL
 echo [2/2] Compilando cliente_generador.exe...
 "%COMPILER%" -std=c++17 cliente_generador.cpp -o cliente_generador.exe -lws2_32
 if errorlevel 1 goto ERROR_CLIENTE
+
+echo.
+echo ========================================================
+echo  [OK] COMPILACION EXITOSA DE AMBOS ARCHIVOS
+echo ========================================================
+echo  1. Ejecuta el visualizador:  python visualizador.py
+echo  2. En otra consola corre:    cliente_generador.exe
+echo ========================================================
+echo.
+pause
+exit /b 0
+
+:ERROR_DLL
+echo.
+echo [ERROR] Fallo al compilar parqueadero_bridge.dll
+pause
+exit /b 1
+
+:ERROR_CLIENTE
+echo.
+echo [ERROR] Fallo al compilar cliente_generador.exe
+pause
+exit /b 1
