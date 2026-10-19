@@ -141,3 +141,24 @@ void bucleServidorTCP(int puerto) {
     closesocket(servidor_socket);
     WSACleanup();
 }
+
+// FUNCIONES EXPORTADAS PARA PYTHON / JAVA
+extern "C" {
+    __declspec(dllexport) int IniciarModuloParqueadero(int puerto) {
+        if (servidorActivo) return 0;
+        servidorActivo = true;
+        for (int i = 0; i < TOTAL_CELDAS; i++) celdas[i].ocupada = false;
+        hiloServidor = std::thread(bucleServidorTCP, puerto);
+        hiloServidor.detach();
+        return 1;
+    }
+
+    __declspec(dllexport) int HayNuevoEvento() {
+        std::lock_guard<std::mutex> lock(mutexParqueadero);
+        return !colaEventos.empty() ? 1 : 0;
+    }
+
+    __declspec(dllexport) int ObtenerSiguienteEvento(
+        int* tipo, char* outPlaca, char* outMarca, char* outColor, 
+        char* outCelda, char* outHora, char* outMensaje
+    ) {
