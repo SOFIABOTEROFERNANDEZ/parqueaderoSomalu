@@ -85,3 +85,59 @@ void bucleServidorTCP(int puerto) {
                         break;
                     }
                 }
+
+               EventoParqueadero ev;
+                memset(&ev, 0, sizeof(EventoParqueadero));
+                strcpy_s(ev.placa, placa.c_str());
+                strcpy_s(ev.marca, marca.c_str());
+                strcpy_s(ev.color, color.c_str());
+                strcpy_s(ev.hora, hora.c_str());
+
+                if (celdaEncontrada != -1) {
+                    // 1. PLACA REPETIDA: LIBERAR
+                    celdas[celdaEncontrada].ocupada = false;
+                    std::string nombreCelda = "C-" + std::to_string(celdaEncontrada + 1);
+                    strcpy_s(ev.celda, nombreCelda.c_str());
+                    ev.tipo = 2; // LIBERACION
+                    strcpy_s(ev.mensaje, "Salida registrada. Celda liberada.");
+                    respuesta = "LIBERADO|" + nombreCelda + "|SALIDA_EXITOSA\n";
+                    colaEventos.push(ev);
+                } else {
+                    // 2. NUEVA PLACA: ASIGNAR CELDA
+                    int celdaLibre = -1;
+                    for (int i = 0; i < TOTAL_CELDAS; i++) {
+                        if (!celdas[i].ocupada) {
+                            celdaLibre = i;
+                            break;
+                        }
+                    }
+
+                    if (celdaLibre != -1) {
+                        celdas[celdaLibre].ocupada = true;
+                        celdas[celdaLibre].placa = placa;
+                        celdas[celdaLibre].marca = marca;
+                        celdas[celdaLibre].color = color;
+                        celdas[celdaLibre].horaIngreso = hora;
+
+                        std::string nombreCelda = "C-" + std::to_string(celdaLibre + 1);
+                        strcpy_s(ev.celda, nombreCelda.c_str());
+                        ev.tipo = 1; // INGRESO
+                        strcpy_s(ev.mensaje, "Ingreso registrado. Celda asignada.");
+                        respuesta = "ASIGNADO|" + nombreCelda + "|INGRESO_EXITOSO\n";
+                        colaEventos.push(ev);
+                    } else {
+                        ev.tipo = 3;
+                        strcpy_s(ev.celda, "NINGUNA");
+                        strcpy_s(ev.mensaje, "Parqueadero lleno.");
+                        respuesta = "RECHAZADO|PARQUEADERO_LLENO\n";
+                        colaEventos.push(ev);
+                    }
+                }
+            }
+            send(clienteSock, respuesta.c_str(), (int)respuesta.length(), 0);
+        }
+        closesocket(clienteSock);
+    }
+    closesocket(servidor_socket);
+    WSACleanup();
+}
