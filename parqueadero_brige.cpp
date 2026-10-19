@@ -162,3 +162,23 @@ extern "C" {
         int* tipo, char* outPlaca, char* outMarca, char* outColor, 
         char* outCelda, char* outHora, char* outMensaje
     ) {
+        std::lock_guard<std::mutex> lock(mutexParqueadero);
+        if (colaEventos.empty()) return 0;
+        EventoParqueadero ev = colaEventos.front();
+        colaEventos.pop();
+
+        *tipo = ev.tipo;
+        strcpy_s(outPlaca, 16, ev.placa);
+        strcpy_s(outMarca, 32, ev.marca);
+        strcpy_s(outColor, 32, ev.color);
+        strcpy_s(outCelda, 16, ev.celda);
+        strcpy_s(outHora, 16, ev.hora);
+        strcpy_s(outMensaje, 128, ev.mensaje);
+        return 1;
+    }
+
+    __declspec(dllexport) void DetenerModuloParqueadero() {
+        servidorActivo = false;
+        if (servidor_socket != INVALID_SOCKET) closesocket(servidor_socket);
+    }
+}
