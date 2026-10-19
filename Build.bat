@@ -42,3 +42,14 @@ echo       python compilar.py
 echo.
 pause
 exit /b 1
+
+:HACER_COMPILACION
+echo [DETECTADO] Usando compilador: %COMPILER%
+echo.
+echo [1/2] Compilando parqueadero_bridge.dll...
+"%COMPILER%" -std=c++17 -shared -O2 parqueadero_bridge.cpp -o parqueadero_bridge.dll -lws2_32
+if errorlevel 1 goto ERROR_DLL
+
+echo [2/2] Compilando cliente_generador.exe...
+"%COMPILER%" -std=c++17 cliente_generador.cpp -o cliente_generador.exe -lws2_32
+if errorlevel 1 goto ERROR_CLIENTE
