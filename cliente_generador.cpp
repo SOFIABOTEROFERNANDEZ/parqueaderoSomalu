@@ -90,7 +90,8 @@ int main() {
         std::string marca = MARCAS[rand() % MARCAS.size()];
         std::string color = COLORES[rand() % COLORES.size()];
         std::string hora = obtenerHoraActual();
-       // Informacion enviada por el socket: MATRICULA|MARCA|COLOR|HORA
+
+        // Informacion enviada por el socket: MATRICULA|MARCA|COLOR|HORA
         std::string trama = placa + "|" + marca + "|" + color + "|" + hora;
 
         std::cout << ">>> Placa: " << placa << " | " << marca << " (" << color << ") | Hora: " << hora;
