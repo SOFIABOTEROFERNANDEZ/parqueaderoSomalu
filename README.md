@@ -1,4 +1,4 @@
-# parqueaderoSomalu[manual_de_usuario_y_documentaci_n.md](https://github.com/user-attachments/files/33697629/manual_de_usuario_y_documentaci_n.md)
+# parqueaderoSomalu
 # Sistema de Control de Parqueadero (C++ & Python GUI)
 
 > Una solución híbrida de alto rendimiento para la simulación, monitoreo y gestión automatizada de un parqueadero de **20 celdas**, combinando la velocidad de procesamiento en **C++** con la flexibilidad de una interfaz gráfica moderna en **Python (Tkinter)**.
