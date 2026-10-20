@@ -1,0 +1,13 @@
+🚀 Cómo Ejecutar el Proyecto
+Compilar: Ejecuta build.bat en tu consola o con doble clic. Se crearán parqueadero_bridge.dll y cliente_generador.exe.
+Lanzar el Visualizador: Abre una consola y corre:
+code
+Cmd
+python visualizador.py
+(Se abrirá la ventana gráfica y la DLL empezará a escuchar conexiones TCP en el puerto 8080).
+Lanzar el Generador C++: En otra consola ejecuta:
+code
+Cmd
+./cliente_generador.exe
+Resultado: Verás cómo cada 2 a 5 segundos ingresan vehículos a las celdas, y cuando una placa se repite, la celda se desocupa y se marca como LIBRE inmediatamente.
+(En la ventana web interactiva de este entorno ya tienes una simulación visual completa y todos los códigos listos con botones de copiado).
