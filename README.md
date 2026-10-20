@@ -2,120 +2,92 @@
   <img src="parqueadero.png" alt="SOMALU - Sistema de control de parqueadero" width="100%">
 </p>
 
+# Sistema Distribuido de Gestión de Parqueadero (C++ y Python vía SWIG)
 
-> Una solución híbrida de alto rendimiento para la simulación, monitoreo y gestión automatizada de un parqueadero de **20 celdas**, combinando la velocidad de procesamiento en **C++** con la flexibilidad de una interfaz gráfica moderna en **Python (Tkinter)**.
+## 1. Descripción General del Proyecto
 
----
+El **Sistema Distribuido de Gestión de Parqueadero** es una solución de software de alta concurrencia e hibridación tecnológica, diseñada para automatizar, monitorear y administrar en tiempo real un recinto de estacionamiento con capacidad para **20 plazas**.
 
-## 📑 Tabla de Contenidos
-1. [Descripción General](#-descripción-general)
-2. [Arquitectura del Sistema](#-arquitectura-del-sistema)
-3. [Estructura del Proyecto](#-estructura-del-proyecto)
-4. [Especificaciones Técnicas](#-specificaciones-técnicas)
-5. [Requisitos Previos y Dependencias](#-requisitos-previos-y-dependencias)
-6. [Guía de Instalación y Configuración](#-guía-de-instalación-y-configuración)
-7. [Manual de Operación de la Interfaz](#-manual-de-operación-de-la-interfaz)
-8. [Manejo de Errores y Solución de Problemas](#-manejo-de-errores-y-solución-de-problemas)
+El sistema implementa una **arquitectura distribuida cliente-servidor** utilizando protocolos de red de bajo nivel (Sockets TCP/IP en C++), combinada con una capa de visualización interactiva en **Python**. La comunicación entre la lógica de control nativa y la interfaz gráfica se logra mediante la generación de un enlace de **librería dinámica** utilizando **SWIG** (*Simplified Wrapper and Interface Generator*), cumpliendo con estándares de desarrollo de software industrial y modularidad.
 
+## 2. Arquitectura y Componentes del Sistema
 
----
+La solución se divide en tres componentes principales que operan de forma cooperativa:
 
-## 🌟 Descripción General
+### 2.1 Módulo Servidor y Núcleo de Lógica (`parqueadero.cpp` / `parqueadero.h`)
+* **Gestión de Concurrencia:** Utiliza hilos independientes (`std::thread`) y exclusión mutua (`std::mutex`) para garantizar la seguridad de los datos ante peticiones simultáneas de red.
+* **Servidor de Sockets TCP:** Inicializa un socket pasivo en el puerto `8080` (utilizando la API WinSock2), procesando tramas de texto con el formato `MATRICULA|MARCA|COLOR|HORA`.
+* **Lógica de Negocio Automática:**
+  * *Ingreso de Vehículos:* Si la matrícula entrante no existe en el sistema, busca la primera celda libre (de C-1 a C-20), registra sus metadatos y emite una señal de asignación con su respectiva estampa de tiempo.
+  * *Liberación por Matrícula Duplicada:* Si la placa ya se encuentra estacionada, el sistema la interpreta como una solicitud de salida, libera la plaza correspondiente y actualiza el estado.
+  * *Control de Capacidad:* Si las 20 celdas están ocupadas, rechaza inteligentemente las nuevas solicitudes notificando estado de lleno.
+* **Cola de Eventos:** Almacena los eventos generados en una estructura de cola segura (`std::queue`) para que la interfaz gráfica en Python pueda consultarlos mediante sondeos asíncronos no bloqueantes.
 
-Este proyecto académico e industrial implementa un sistema cliente-servidor embebido de control de acceso vehicular. El núcleo del sistema corre bajo una lógica de bajo nivel optimizada en **C++**, encargada de administrar las transacciones de entrada, salida, asignación dinámica de celdas (del 1 al 20) y persistencia temporal de estados. 
+### 2.2 Módulo Cliente Generador de Tráfico (`cliente_generador.cpp`)
+* Simula un proceso externo independiente que actúa como cliente TCP.
+* Genera de forma pseudoaleatoria matrículas vehiculares estándar (3 letras mayúsculas y 3 dígitos numéricos, ej: `ABC123`), marcas comerciales y colores.
+* Implementa un **pool de placas activas** con un factor de probabilidad del 40% para simular salidas de vehículos reintentando placas ya registradas, forzando así la liberación de celdas en el servidor.
+* Transmite las tramas de datos de forma continua con intervalos temporales aleatorios de entre 2 y 5 segundos.
 
-Por su parte, la capa visual implementada en **Python** se comunica en tiempo real con este motor a través de una librería de enlace dinámico (`.dll`) y sockets de red (`WinSock2`), ofreciendo al operador un panel intuitivo con indicadores visuales de disponibilidad y una consola de eventos cronológica.
+### 2.3 Módulo de Visualización Gráfica (`visualizador.py`)
+* Desarrollado en **Python** utilizando **Tkinter** para una interfaz moderna y de bajo consumo de recursos (tema oscuro optimizado).
+* Importa directamente la librería dinámica compilada por SWIG (`import parqueadero`), la cual expone funciones nativas de C++ (`IniciarServidor`, `HayEvento`, `ObtenerEvento`, `DetenerServidor`).
+* Actualiza dinámicamente una matriz visual de 20 tarjetas correspondientes a las celdas del parqueadero y alimenta un registro en tiempo real (*Log de Eventos*) mediante un bucle de sondeo no bloqueante de 100ms (`self.after`).
 
----
-
-## 🏗️ Arquitectura del Sistema
-
-La arquitectura sigue un patrón desacoplado donde la lógica pesada y de red reside en el backend nativo:
-
-```text
-+-----------------------+          Carga y llamadas          +-------------------------+
-|    visualizador.py    | ---------------------------------> | parqueadero_bridge.dll  |
-|  (Python + Tkinter)   | <--------------------------------- |      (Motor en C++)     |
-+-----------------------+       Sockets / WinSock2           +-------------------------+
-```
-
-* **Backend (C++):** Administra el ciclo de vida de los vehículos, valida restricciones de cupo máximo (20 espacios) y procesa las tramas de comandos enviadas a través del protocolo de red local.
-* **Frontend (Python):** Utiliza el módulo nativo `ctypes` para interactuar con las funciones exportadas por la DLL y ejecuta un bucle de sondeo (`polling` asíncrono con `after`) cada `100 ms` para refrescar los componentes gráficos sin bloquear el hilo principal de la interfaz.
-
----
-
-## 📋 Estructura del Repositorio
-
-La distribución de los archivos esenciales en el directorio de trabajo es la siguiente:
+## 3. Diagrama Arquitectónico y de Flujo
 
 ```text
-.
-├── parqueadero_bridge.dll    # Librería dinámica compilada (Binario C++)
-├── visualizador.py           # Script principal de la Interfaz Gráfica (Python)
-└── README.md                 # Documentación y manual técnico del sistema
++---------------------------------------+
+|  Cliente Generador de Tráfico (C++)   |
+|  - Genera placas aleatorias           |
+|  - Simula ingresos y salidas          |
++---------------------------------------+
+                    |
+                    | Trama TCP/IP: PLACA|MARCA|COLOR|HORA
+                    v (Puerto 8080)
++---------------------------------------+
+|  Motor Servidor de Parqueadero (C++)  |
+|  - Control por Mutex e Hilos          |
+|  - Asignación de 20 Celdas            |
+|  - Cola de Eventos                    |
++---------------------------------------+
+                    |
+                    | Enlace de Librería Dinámica (SWIG)
+                    v
++---------------------------------------+
+|  Interfaz Gráfica de Usuario (Python) |
+|  - Visualizador en Tkinter            |
+|  - Renderizado de Plazas en Tiempo Real|
++---------------------------------------+
 ```
 
----
+## 4. Requisitos del Sistema y Dependencias
 
-## ⚙️ Especificaciones Técnicas
+* **Compilador C++:** Entorno compatible con C++17 (MSVC en Visual Studio, MinGW-w64 o GCC).
+* **Entorno Python:** Python 3.8 o superior con soporte para bibliotecas estándar de GUI.
+* **Herramienta SWIG:** Instalada y registrada en las variables de entorno (*PATH*).
+* **Librerías del Sistema Operativo:** Winsock2 (`ws2_32.lib`) para la gestión de sockets en redes Windows.
 
-* **Capacidad Máxima:** 20 celdas numeradas secuencialmente del `1` al `20`.
-* **Protocolo de Comunicación:** Sockets TCP/IP locales a través del puerto por defecto `8080`.
-* **Codificación de Datos:** Tramas de texto plano estructuradas para intercambio rápido de comandos (Ingreso, Salida, Estado General).
-* **Frecuencia de Actualización:** `100 milisegundos` en el cliente Python para la sincronización del estado de las celdas.
+## 5. Guía de Instalación, Compilación y Ejecución
 
----
+Siga los pasos a continuación para poner en marcha el sistema distribuido completo:
 
-## 📦 Requisitos Previos y Dependencias
+### Paso 1: Generación de la Librería Dinámica mediante SWIG
+Ejecute el script de configuración para compilar las interfaces de C++ hacia Python:
+```bash
+python setup.py build_ext --inplace
+```
+*(Esto generará los archivos de enlace binario necesarios junto con el módulo de interfaz `parqueadero.py`)*.
 
-Antes de poner en marcha la aplicación, asegúrate de cumplir con los siguientes requisitos en tu entorno de desarrollo:
+### Paso 2: Ejecución del Módulo Visualizador (Servidor Central)
+Inicie la aplicación gráfica de Python. Esta acción arrancará automáticamente el socket del servidor C++ en segundo plano:
+```bash
+python visualizador.py
+```
 
-1. **Intérprete de Python:** Versión `3.8` o superior instalada y añadida a las variables de entorno del sistema (`PATH`).
-2. **Entorno Operativo:** Sistema operativo Windows (debido a la dependencia nativa de la librería compilada con llamadas a `WinSock2` y formato `.dll`).
-3. **Librerías Nativas de Python:** El proyecto utiliza exclusivamente módulos incluidos en la librería estándar (`tkinter`, `ctypes`, `threading`, `time`), por lo que **no requiere** la instalación de paquetes externos mediante `pip`.
-
----
-
-## 🚀 Guía de Instalación y Ejecución
-
-Sigue estos sencillos pasos para clonar, preparar y ejecutar el sistema en tu máquina local:
-
-1. **Clonar o descargar el repositorio:**
-   Ubícate en la carpeta donde deseas alojar el proyecto.
-
-2. **Verificar archivos binarios:**
-   Comprueba que el archivo `parqueadero_bridge.dll` se encuentre ubicado exactamente en la misma ruta que el script `visualizador.py`.
-
-3. **Ejecutar la Interfaz Gráfica:**
-   Abre una terminal (CMD o PowerShell) en la ruta del proyecto y ejecuta el siguiente comando:
-   ```bash
-   python visualizador.py
-   ```
-
-4. **Verificación de Conexión:**
-   Una vez lanzado el script, la ventana principal de Tkinter se abrirá mostrando el estado inicial del parqueadero. El log de eventos indicará si la conexión con la DLL se estableció de manera exitosa.
-
----
-
-## 🎛️ Manual de Operación de la Interfaz
-
-La interfaz gráfica ha sido diseñada bajo principios de usabilidad para operadores de sistemas de control:
-
-* **Panel de Celdas (Grid 4x5):** 
-  * Las celdas disponibles se muestran con indicadores visuales distintivos (por ejemplo, tonos verdes).
-  * Las celdas ocupadas reflejan el estado activo y muestran la información básica del vehículo asociado (tono rojo/gris oscuro).
-* **Consola de Historial (Log):**
-  * Ubicada en la sección inferior o lateral de la ventana, registra cronológicamente cada ingreso de placa, liberación de celda y advertencia del sistema con marcas de tiempo precisas.
-* **Controles de Acceso:**
-  * Permiten enviar las solicitudes de registro al backend en C++ de forma inmediata con un solo clic.
-
----
-
-## 🛠️ Manejo de Errores y Solución de Problemas
-
-* **Error: `FileNotFoundError` o fallo al cargar la DLL**
-  * *Causa:* Python no logra encontrar el archivo `parqueadero_bridge.dll` en el directorio actual.
-  * *Solución:* Asegúrate de ejecutar el script `visualizador.py` estando posicionado exactamente en la carpeta raíz del proyecto.
-* **Error de Sockets / Puerto Ocupado**
-  * *Causa:* El puerto `8080` está siendo utilizado por otra aplicación en segundo plano.
-  * *Solución:* Cierra procesos residuales de ejecuciones anteriores de C++ o cambia temporalmente el puerto de escucha en la configuración del backend.
+### Paso 3: Ejecución del Cliente de Tráfico Vehicular
+En una terminal independiente, compile el código fuente del cliente y ejecútelo para comenzar la transmisión:
+```bash
+g++ cliente_generador.cpp -o cliente_generador.exe -lws2_32
+./cliente_generador.exe
+```
