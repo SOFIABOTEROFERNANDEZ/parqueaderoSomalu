@@ -117,11 +117,3 @@ La interfaz gráfica ha sido diseñada bajo principios de usabilidad para operad
 * **Error de Sockets / Puerto Ocupado**
   * *Causa:* El puerto `8080` está siendo utilizado por otra aplicación en segundo plano.
   * *Solución:* Cierra procesos residuales de ejecuciones anteriores de C++ o cambia temporalmente el puerto de escucha en la configuración del backend.
-
----
-
-## 👥 Créditos y Colaboradores
-
-Proyecto desarrollado de forma colaborativa para la asignatura de Estructuras de Datos y Programación de Sistemas de Bajo Nivel. 
-* **Autores:** Equipo de Desarrollo de Arquitectura Híbrida C++/Python.
-* **Licencia:** Uso académico e institucional libre bajo los términos del repositorio.
