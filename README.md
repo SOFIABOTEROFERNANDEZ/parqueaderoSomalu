@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="parqueadero.jpg" alt="SOMALU - Sistema de control de parqueadero" width="100%">
+</p>
 # parqueaderoSomalu
 # Sistema de Control de Parqueadero (C++ & Python GUI)
 
