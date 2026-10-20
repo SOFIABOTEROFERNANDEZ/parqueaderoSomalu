@@ -11,21 +11,20 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 
-// Directiva para Microsoft Visual C++
 #pragma comment(lib, "ws2_32.lib")
 
 #define SERVER_IP "127.0.0.1" // Cambiar por la IP del servidor si esta en otra PC
 #define SERVER_PORT 8080
 #define BUFFER_SIZE 1024
 
-// Marcas y colores compatibles con cualquier version de C++ (C++98 a C++20)
+// Marcas y colores compatibles 
 static const char* MARCAS[] = {"Toyota", "Chevrolet", "Mazda", "Nissan", "Renault", "Ford", "Kia", "BMW"};
 static const int NUM_MARCAS = sizeof(MARCAS) / sizeof(MARCAS[0]);
 
 static const char* COLORES[] = {"Blanco", "Negro", "Rojo", "Azul", "Gris", "Plata"};
 static const int NUM_COLORES = sizeof(COLORES) / sizeof(COLORES[0]);
 
-// Genera matricula: 3 letras mayusculas seguidas de 3 digitos (Ej: ABC123)
+// Genera matricula(ABC123)
 std::string generarMatriculaAleatoria() {
     std::string placa = "";
     for (int i = 0; i < 3; i++) placa += (char)('A' + (rand() % 26));
@@ -33,7 +32,7 @@ std::string generarMatriculaAleatoria() {
     return placa;
 }
 
-// Obtiene la hora actual en formato HH:MM:SS
+// Codigo para hora-formato HH:MM:SS
 std::string obtenerHoraActual() {
     std::time_t t = std::time(NULL);
     std::tm* now = std::localtime(&t);
@@ -53,7 +52,7 @@ int main() {
     struct sockaddr_in serv_addr;
     char buffer[BUFFER_SIZE] = {0};
 
-    // Pool de vehiculos activos para repetir deliberadamente placas y forzar SALIDAS
+    // Pool de placas generadas para repetir y forzar SALIDAS
     std::vector<std::string> poolPlacasEstacionadas;
 
     std::cout << "========================================================\n";
