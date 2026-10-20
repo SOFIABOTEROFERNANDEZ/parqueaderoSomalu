@@ -1,5 +1,5 @@
 import tkinter as tk
-import parqueadero # <-- Módulo C++ importado gracias a SWIG
+import parqueadero # <-- Módulo de C++ importado con SWIG
 
 class ParqueaderoVisualizer(tk.Tk):
     def __init__(self):
