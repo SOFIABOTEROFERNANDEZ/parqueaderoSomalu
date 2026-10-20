@@ -16,7 +16,7 @@
 6. [Guía de Instalación y Configuración](#-guía-de-instalación-y-configuración)
 7. [Manual de Operación de la Interfaz](#-manual-de-operación-de-la-interfaz)
 8. [Manejo de Errores y Solución de Problemas](#-manejo-de-errores-y-solución-de-problemas)
-9. [Créditos y Contribución](#-créditos-y-contribución)
+
 
 ---
 
